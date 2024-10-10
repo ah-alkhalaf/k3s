@@ -1,0 +1,114 @@
+= K3s Installation Guide
+:toc: macro
+:toclevels: 3
+:sectanchors:
+
+== Einführung
+
+K3s ist eine leichtgewichtige Kubernetes-Distribution, die speziell für Edge-Computing und IoT-Anwendungen entwickelt wurde. Diese Anleitung beschreibt, wie man K3s mit einem Master-Node und einem Worker-Node installiert. Außerdem werden häufige Probleme und deren Lösungen behandelt.
+
+== Voraussetzungen
+
+* Zwei Linux-Server (z. B. Ubuntu 20.04), einer für den Master-Node und einer für den Worker-Node.
+* Root-Zugriff auf beiden Servern.
+* Internetzugang für die Installation von Abhängigkeiten und K3s.
+
+== Schritt 1: Master-Node installieren
+
+1. Melde dich am Master-Node an.
+
+2. Aktualisiere das System:
+
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   ```
+
+3. Installiere K3s:
+
+   ```bash
+   curl -sfL https://get.k3s.io | sh -
+   ```
+
+4. Überprüfe, ob K3s erfolgreich installiert wurde:
+
+   ```bash
+   sudo systemctl status k3s
+   ```
+
+5. Notiere den Token für die Worker-Node. Der Token befindet sich in der Datei `/var/lib/rancher/k3s/server/node-token`:
+
+   ```bash
+   sudo cat /var/lib/rancher/k3s/server/node-token
+   ```
+
+== Schritt 2: Worker-Node installieren
+
+1. Melde dich am Worker-Node an.
+
+2. Aktualisiere das System:
+
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   ```
+
+3. Installiere K3s und verbinde dich mit dem Master-Node. Ersetze `<MASTER_IP>` mit der IP-Adresse des Master-Nodes und `<NODE_TOKEN>` mit dem Token, den du im vorherigen Schritt notiert hast:
+
+   ```bash
+   curl -sfL https://get.k3s.io | K3S_URL=https://<MASTER_IP>:6443 K3S_TOKEN=<NODE_TOKEN> sh -
+   ```
+
+4. Überprüfe den Status des K3s-Dienstes:
+
+   ```bash
+   sudo systemctl status k3s
+   ```
+
+== Schritt 3: Überprüfen der Installation
+
+1. Auf dem Master-Node führe den folgenden Befehl aus, um den Status der Nodes zu überprüfen:
+
+   ```bash
+   sudo k3s kubectl get nodes
+   ```
+
+2. Du solltest beide Nodes (Master und Worker) in der Liste sehen.
+
+== Troubleshooting
+
+Hier sind einige häufige Probleme und deren Lösungen:
+
+=== Problem 1: K3s-Dienst startet nicht
+
+* Überprüfe die Logs des K3s-Dienstes:
+
+  ```bash
+  sudo journalctl -u k3s
+  ```
+
+* Stelle sicher, dass alle erforderlichen Ports offen sind (6443, 10250, 10255).
+
+=== Problem 2: Worker-Node wird nicht angezeigt
+
+* Stelle sicher, dass der Token korrekt ist und der Worker-Node die richtige IP-Adresse des Master-Nodes verwendet.
+
+* Überprüfe die Firewall-Einstellungen auf dem Master-Node:
+
+  ```bash
+  sudo iptables -L -n
+  ```
+
+* Überprüfe, ob der K3s-Dienst auf dem Master-Node läuft.
+
+=== Problem 3: Netzwerkprobleme
+
+* Stelle sicher, dass beide Nodes im selben Netzwerk sind und sich gegenseitig erreichen können.
+
+* Überprüfe die Netzwerkeinstellungen und führe einen Ping-Test durch:
+
+  ```bash
+  ping <MASTER_IP>
+  ```
+
+== Fazit
+
+Du hast erfolgreich K3s mit einem Master- und einem Worker-Node installiert. Nutze die oben genannten Schritte zur Fehlersuche, falls du auf Probleme stößt. K3s ist nun bereit, um Container-Orchestrierung für deine Anwendungen bereitzustellen.
