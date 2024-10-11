@@ -12,11 +12,13 @@ K3s ist eine leichtgewichtige Kubernetes-Distribution, die speziell für Edge-Co
 * 3 Linux-Server (z. B. debian-12.6.0-amd64), einer für den Master-Node und 2 für den Worker-Node.
 * Root-Zugriff auf beiden Servern.
 * Internetzugang für die Installation von Abhängigkeiten und K3s.
->[!NOTE]
+[!NOTE]
 Hostname muss nicht identsich sein, falls zu späte dann: 
+
 ```
 sudo hostnamectl set-hostname <neuer-hostname>
 ````
+
 == Schritt 1: Master-Node installieren
 
 1. Melde dich am Master-Node an und Installiere K3s:
@@ -24,6 +26,7 @@ sudo hostnamectl set-hostname <neuer-hostname>
 ```bash
 curl -sfL https://get.k3s.io | sh -
 ```
+
 2. Notiere den Token für die Worker-Node. Der Token befindet sich in der Datei `/var/lib/rancher/k3s/server/node-token`:
 
 ```
